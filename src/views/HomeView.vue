@@ -10,6 +10,7 @@ import { formatDateShort } from '@/utils/format'
 import type { Announcement, Post } from '@/types'
 import PostCard from '@/components/molecules/PostCard.vue'
 import SakuraPetals from '@/components/molecules/SakuraPetals.vue'
+import SpellCard from '@/components/molecules/SpellCard.vue'
 import SkeletonBox from '@/components/atoms/SkeletonBox.vue'
 import EmptyState from '@/components/atoms/EmptyState.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -133,28 +134,8 @@ function goCreateQuestion() {
           :enter="{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20, delay: 200 } }"
           :class="$style.heroVisual"
         >
-          <div :class="$style.visualPanel">
-            <svg viewBox="0 0 440 320" fill="none" aria-hidden="true" :class="$style.molecule">
-              <circle cx="160" cy="150" r="98" stroke="var(--c-border-strong)" stroke-dasharray="2 8" opacity="0.8" />
-              <g stroke="var(--c-slate)" stroke-linejoin="round">
-                <path d="M160 78 222.4 114v72L160 222l-62.4-36v-72Z" stroke-width="2" />
-                <path d="M160 100 203.3 125v50L160 200l-43.3-25v-50Z" stroke-width="1.4" />
-                <path d="M330 54 359.4 71v34L330 122l-29.4-17V71Z" stroke-width="1.6" />
-                <path d="M330 198 359.4 215v34L330 266l-29.4-17v-34Z" stroke-width="1.6" />
-                <path d="M222.4 114 300.6 71" stroke-width="1.4" />
-                <path d="M222.4 186 300.6 215" stroke-width="1.4" />
-                <circle cx="222.4" cy="114" r="4" fill="var(--c-slate)" stroke="none" />
-                <circle cx="300.6" cy="71" r="4" fill="var(--c-slate)" stroke="none" />
-                <circle cx="222.4" cy="186" r="4" fill="var(--c-slate)" stroke="none" />
-                <circle cx="300.6" cy="215" r="4" fill="var(--c-slate)" stroke="none" />
-              </g>
-              <circle cx="160" cy="150" r="17" stroke="var(--c-accent)" stroke-width="1.6" />
-              <circle cx="330" cy="88" r="8" stroke="var(--c-slate)" stroke-width="1.4" />
-              <circle cx="330" cy="232" r="8" stroke="var(--c-slate)" stroke-width="1.4" />
-              <g :class="$style.orbitDot">
-                <circle cx="229.3" cy="80.7" r="4.5" fill="var(--c-accent)" stroke="none" />
-              </g>
-            </svg>
+          <div :class="$style.spellWrap">
+            <SpellCard />
             <div :class="$style.liveCard">
               <span :class="$style.liveDot" aria-hidden="true" />
               <div :class="$style.liveText">
@@ -370,73 +351,38 @@ function goCreateQuestion() {
   }
 }
 
-.visualPanel {
+.spellWrap {
   position: relative;
   width: 100%;
-  max-width: 480px;
-  padding: 2.5rem;
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
-  border-radius: var(--r-panel);
-  box-shadow: var(--shadow-card);
-
-  // 弹幕点阵底纹：符卡面板的弹幕氛围
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
-    background-image:
-      radial-gradient(circle 2px, var(--c-slate) 40%, transparent 46%),
-      radial-gradient(circle 1.5px, var(--c-slate) 40%, transparent 46%),
-      radial-gradient(circle 3px, var(--c-accent) 18%, transparent 40%);
-    background-size: 36px 36px, 22px 22px, 58px 58px;
-    background-position: 0 0, 11px 9px, 19px 3px;
-    opacity: 0.4;
-  }
-
-  @media (max-width: $bp-tablet - 1) {
-    padding: 1.5rem;
-    border-radius: var(--r-card);
-  }
+  max-width: 470px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.molecule {
-  width: 100%;
-  height: auto;
-}
-
-.orbitDot {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: orbit-pulse 2.4s ease-in-out infinite;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
-}
-
-@keyframes orbit-pulse {
-  0%,
-  100% {
-    opacity: 0.45;
-    transform: scale(0.8);
-  }
-
-  50% {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-}
-
+// 公告徽章：浮贴在符卡右上角，轻微错位旋转
 .liveCard {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.75rem;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  margin-top: 1.75rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--c-border);
+  gap: 0.625rem;
+  max-width: 300px;
+  padding: 0.75rem 1rem;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-pop);
+  transform: rotate(1.6deg);
+
+  @media (max-width: $bp-tablet - 1) {
+    position: static;
+    transform: none;
+    max-width: 100%;
+    margin-top: 1.25rem;
+  }
 }
 
 .liveDot {
@@ -492,16 +438,15 @@ function goCreateQuestion() {
 }
 
 .visualCaption {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.75rem;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
+  margin-top: 1rem;
   font-family: var(--font-mono);
   font-size: var(--fs-meta);
   letter-spacing: 0.08em;
   color: var(--c-slate);
+  transform: rotate(-1deg);
 }
 
 .captionSeal {
