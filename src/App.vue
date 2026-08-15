@@ -2,6 +2,7 @@
 import ToastHost from '@/components/organisms/ToastHost.vue'
 import CookieConsent from '@/components/organisms/CookieConsent.vue'
 import PetalBurst from '@/components/molecules/PetalBurst.vue'
+import UnreadAnnouncementPopup from '@/components/organisms/UnreadAnnouncementPopup.vue'
 import { useSpellCode } from '@/composables/useSpellCode'
 
 // 彩蛋：在页面任意处键入 "lunatic" 解锁 LUNATIC 难度
@@ -13,4 +14,5 @@ useSpellCode()
   <ToastHost />
   <CookieConsent />
   <PetalBurst />
+  <UnreadAnnouncementPopup />
 </template>

@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchAnnouncements } from '@/api/announcements'
 import { useUserStore } from '@/stores/user'
+import { useAnnouncementReadsStore } from '@/stores/announcementReads'
 import { formatDate, shortId, stripMarkdown } from '@/utils/format'
 import type { Announcement } from '@/types'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -13,6 +14,7 @@ import EmptyState from '@/components/atoms/EmptyState.vue'
 
 const router = useRouter()
 const user = useUserStore()
+const reads = useAnnouncementReadsStore()
 
 const list = ref<Announcement[]>([])
 const pagination = ref({ page: 1, pages: 0, total: 0 })
@@ -43,7 +45,10 @@ function changePage(page: number) {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onMounted(() => void load())
+onMounted(() => {
+  reads.ensureBaseline() // 防御性，幂等；正常已由弹窗组件保证
+  void load()
+})
 </script>
 
 <template>
@@ -82,7 +87,10 @@ onMounted(() => void load())
         >
           <button type="button" :class="$style.rowHead" :aria-expanded="expandedId === item.id" @click="toggle(item.id)">
             <div :class="$style.rowTitle">
-              <h2 :class="$style.title">{{ item.title }}</h2>
+              <div :class="$style.titleLine">
+                <h2 :class="$style.title">{{ item.title }}</h2>
+                <span v-if="reads.isUnread(item.id, item.created_at)" :class="$style.unreadBadge">未读</span>
+              </div>
               <p v-if="expandedId !== item.id" :class="$style.excerpt">{{ stripMarkdown(item.content, 140) }}</p>
             </div>
             <div :class="$style.rowAside">
@@ -92,7 +100,18 @@ onMounted(() => void load())
           </button>
           <div v-if="expandedId === item.id" :class="$style.rowBody">
             <MarkdownView :content="item.content" />
-            <p :class="$style.author">发布者 · {{ item.author?.username || shortId(item.author_id) }}</p>
+            <div :class="$style.rowFoot">
+              <p :class="$style.author">发布者 · {{ item.author?.username || shortId(item.author_id) }}</p>
+              <BaseButton
+                v-if="reads.isUnread(item.id, item.created_at)"
+                size="sm"
+                variant="outline"
+                @click="reads.markRead(item.id)"
+              >
+                标记已读
+              </BaseButton>
+              <BaseButton v-else size="sm" variant="ghost" @click="reads.markUnread(item.id)">标记未读</BaseButton>
+            </div>
           </div>
         </article>
       </template>
@@ -169,6 +188,22 @@ onMounted(() => void load())
   letter-spacing: -0.01em;
 }
 
+.titleLine {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.unreadBadge {
+  flex-shrink: 0;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--r-full);
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .excerpt {
   margin-top: 0.375rem;
   color: var(--c-steel);
@@ -226,10 +261,18 @@ onMounted(() => void load())
   }
 }
 
-.author {
+.rowFoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   margin-top: 1rem;
   padding-top: 0.875rem;
   border-top: 1px solid var(--c-border);
+}
+
+.author {
   font-size: var(--fs-meta);
   color: var(--c-slate);
 }
