@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ToastHost from '@/components/organisms/ToastHost.vue'
+import CookieConsent from '@/components/organisms/CookieConsent.vue'
 import PetalBurst from '@/components/molecules/PetalBurst.vue'
 import { useSpellCode } from '@/composables/useSpellCode'
 
@@ -10,5 +11,6 @@ useSpellCode()
 <template>
   <RouterView />
   <ToastHost />
+  <CookieConsent />
   <PetalBurst />
 </template>
