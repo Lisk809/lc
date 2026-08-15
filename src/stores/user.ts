@@ -95,11 +95,10 @@ export const useUserStore = defineStore('user', {
       this.isAdmin = me.is_admin ?? false
     },
 
-    /** PATCH /api/me：字段使用 avatar（后端兼容 avatar_url 过渡） */
+    /** PATCH /api/me（仅 bio；头像由 Gravatar 提供） */
     async updateProfile(payload: UpdateProfilePayload) {
       await updateProfile(payload)
       if (payload.bio !== undefined) this.bio = payload.bio
-      if (payload.avatar !== undefined) this.avatar = payload.avatar || null
     },
 
     logout() {

@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/user'
 import { useUiStore } from '@/stores/ui'
 import { fetchMyFiles, fetchMyPosts, fetchMyQuestions } from '@/api/me'
 import { formatBytes, formatDate, formatRelativeTime, shortId, stripMarkdown } from '@/utils/format'
-import type { MyPost, MyQuestion, Paginated, ProfileTab, UploadResult, UserFile } from '@/types'
+import type { MyPost, MyQuestion, Paginated, ProfileTab, UserFile } from '@/types'
 import ProfileSidebar from '@/components/organisms/ProfileSidebar.vue'
 import AppAvatar from '@/components/atoms/AppAvatar.vue'
 import BaseInput from '@/components/atoms/BaseInput.vue'
@@ -98,15 +98,6 @@ async function saveBio() {
   }
 }
 
-async function onAvatarUploaded(result: UploadResult) {
-  try {
-    await user.updateProfile({ avatar: result.url })
-    ui.toast('头像已更新', 'success')
-  } catch {
-    // 拦截器已提示
-  }
-}
-
 function onFileUploaded() {
   ui.toast('文件上传成功', 'success')
   void loadFiles(1)
@@ -171,8 +162,11 @@ function onFileUploaded() {
 
           <div :class="$style.card">
             <p :class="$style.cardLabel">AVATAR</p>
-            <p :class="$style.cardHint">上传图片更换头像，支持 .png / .jpg / .jpeg，不超过 10MB。</p>
-            <FileDropZone mode="upload" compact @uploaded="onAvatarUploaded" />
+            <p :class="$style.cardHint">
+              头像由 Gravatar 提供，与注册邮箱绑定。前往
+              <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer" :class="$style.cardLink">gravatar.com</a>
+              用同一邮箱设置头像后自动生效。
+            </p>
           </div>
         </section>
 
@@ -377,6 +371,16 @@ function onFileUploaded() {
   margin: -0.5rem 0 1rem;
   color: var(--c-steel);
   font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.cardLink {
+  color: var(--c-accent);
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .account {

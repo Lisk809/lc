@@ -76,7 +76,6 @@ export interface Me {
 
 export interface UpdateProfilePayload {
   bio?: string
-  avatar?: string
 }
 
 export interface MyPost {

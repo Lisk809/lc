@@ -6,7 +6,7 @@ export function fetchMe() {
   return http.get<Me>('/api/me')
 }
 
-/** PATCH /api/me（头像字段统一为 avatar，兼容后端 avatar_url 过渡） */
+/** PATCH /api/me（仅 bio；头像由 Gravatar 提供） */
 export function updateProfile(payload: UpdateProfilePayload) {
   return http.patch<{ message: string }>('/api/me', payload)
 }
