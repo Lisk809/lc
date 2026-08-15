@@ -17,9 +17,23 @@ const error = ref('')
 const loading = ref(false)
 const attempted = ref(false)
 const pwnedCount = ref(0)
+const pwnedChecking = ref(false)
+let pwnedTimer: ReturnType<typeof setTimeout> | null = null
 
-// 修改密码后清除泄露提示
-watch(() => form.password, () => { pwnedCount.value = 0 })
+// 输入密码时实时检查是否已泄露（防抖 400ms）；服务不可用时静默放行
+watch(() => form.password, (pw) => {
+  pwnedCount.value = 0
+  pwnedChecking.value = false
+  if (pwnedTimer) clearTimeout(pwnedTimer)
+  if (!pw) return
+  pwnedTimer = setTimeout(async () => {
+    pwnedChecking.value = true
+    const count = await checkPwnedPassword(pw)
+    // 仅当仍是当前输入的密码时才展示结果（避免过期检查覆盖新结果）
+    if (form.password === pw && count > 0) pwnedCount.value = count
+    pwnedChecking.value = false
+  }, 400)
+})
 
 const widgetEl = ref<HTMLElement | null>(null)
 const { token, reset } = useTurnstile(widgetEl, import.meta.env.VITE_TURNSTILE_SITE_KEY)
@@ -99,6 +113,7 @@ async function submit() {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
         此密码已在 {{ pwnedCount }} 起数据泄露中出现，极易被撞库攻击，请更换一个更强的密码
       </div>
+      <p v-else-if="pwnedChecking" :class="$style.pwnedChecking">正在检查密码是否已出现在数据泄露中…</p>
 
       <div ref="widgetEl" :class="$style.turnstile" />
 
@@ -144,6 +159,11 @@ async function submit() {
 
 .turnstile {
   margin-top: 0.25rem;
+}
+
+.pwnedChecking {
+  color: var(--c-slate);
+  font-size: 0.8125rem;
 }
 
 .formError,
