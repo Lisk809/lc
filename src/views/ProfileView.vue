@@ -246,10 +246,9 @@ function onFileUploaded() {
                 <div :class="$style.itemMain">
                   <h3 :class="$style.itemTitle">{{ q.title }}</h3>
                   <p :class="$style.itemSub">{{ stripMarkdown(q.content, 120) }}</p>
-                  <p v-if="q.answer" :class="$style.answer">参考答案 · {{ q.answer }}</p>
+                  <p v-if="q.answer" :class="$style.answer">参考答案 · {{ stripMarkdown(q.answer, 60) }}</p>
                 </div>
                 <div :class="$style.itemAside">
-                  <span :class="$style.itemMeta">{{ q.options.length }} 个选项</span>
                   <span :class="$style.itemMeta">{{ formatRelativeTime(q.created_at) }}</span>
                 </div>
               </div>

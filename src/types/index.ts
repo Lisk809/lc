@@ -92,8 +92,7 @@ export interface MyQuestion {
   id: string
   title: string
   content: string
-  options: string[]
-  /** 仅作者本人可见（/api/me/questions） */
+  /** 本人题目，答案随行返回 */
   answer: string | null
   attachment_url: string | null
   created_at: number
@@ -175,8 +174,7 @@ export interface Question {
   id: string
   title: string
   content: string
-  options: string[]
-  /** 仅作者可见，非作者为 null（后端保证） */
+  /** 参考答案（markdown），详情弹窗中默认折叠，点击展开 */
   answer: string | null
   user_id: string
   author: Author | null

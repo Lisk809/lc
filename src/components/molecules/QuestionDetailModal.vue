@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import { computed, watch, onBeforeUnmount } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { ref, watch, onBeforeUnmount } from 'vue'
 import { fileNameFromUrl, formatDate, shortId } from '@/utils/format'
 import type { Question } from '@/types'
 import MarkdownView from '@/components/molecules/MarkdownView.vue'
-import QuestionOptionList from '@/components/molecules/QuestionOptionList.vue'
 import AppAvatar from '@/components/atoms/AppAvatar.vue'
 import YinYangMark from '@/components/atoms/YinYangMark.vue'
 
 const props = defineProps<{ question: Question | null }>()
 const emit = defineEmits<{ close: [] }>()
 
-const user = useUserStore()
+/** 参考答案默认折叠，点击按钮展开 */
+const answerOpen = ref(false)
 
-// 答案仅作者本人与管理员可见（后端对非作者已返回 null，此处为二次防线）
-const canSeeAnswer = computed(
-  () => Boolean(props.question?.answer) && (user.isAdmin || user.id === props.question?.user_id)
-)
+const hasAnswer = () => Boolean(props.question?.answer?.trim())
 
 const fileName = props.question?.attachment_url
   ? fileNameFromUrl(props.question.attachment_url)
@@ -29,6 +25,7 @@ function onKeydown(e: KeyboardEvent) {
 watch(
   () => props.question,
   (q) => {
+    answerOpen.value = false
     document.body.style.overflow = q ? 'hidden' : ''
     if (q) window.addEventListener('keydown', onKeydown)
     else window.removeEventListener('keydown', onKeydown)
@@ -56,17 +53,23 @@ onBeforeUnmount(() => {
           <div :class="$style.body">
             <MarkdownView :content="question.content" />
 
-            <section :class="$style.optionsSection">
-              <p :class="$style.sectionLabel">选项</p>
-              <QuestionOptionList :options="question.options" :answer="canSeeAnswer ? question.answer : null" />
-            </section>
-
-            <section v-if="canSeeAnswer" :class="$style.answerSection">
-              <p :class="$style.sectionLabel">
+            <section v-if="hasAnswer()" :class="$style.answerSection">
+              <button
+                type="button"
+                :class="$style.answerToggle"
+                :aria-expanded="answerOpen"
+                aria-controls="question-answer"
+                @click="answerOpen = !answerOpen"
+              >
                 <YinYangMark :class="$style.seal" aria-hidden="true" />
-                参考答案 · 仅作者与管理员可见
-              </p>
-              <div :class="$style.answerBox">{{ question.answer }}</div>
+                {{ answerOpen ? '收起参考答案' : '查看参考答案' }}
+                <svg :class="[$style.chevron, answerOpen && $style.chevronOpen]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+              </button>
+              <Transition name="answer">
+                <div v-if="answerOpen" id="question-answer" :class="$style.answerBox">
+                  <MarkdownView :content="question.answer || ''" />
+                </div>
+              </Transition>
             </section>
 
             <a
@@ -160,18 +163,40 @@ onBeforeUnmount(() => {
   overflow-y: auto;
 }
 
-.optionsSection,
 .answerSection {
   margin-top: 1.75rem;
 }
 
-.sectionLabel {
-  margin-bottom: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: var(--fs-meta);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--c-slate);
+.answerToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-sm);
+  background: var(--c-surface-2);
+  color: var(--c-steel);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color $dur var(--ease-out), border-color $dur var(--ease-out),
+    background-color $dur var(--ease-out);
+
+  &:hover {
+    color: var(--c-accent);
+    border-color: var(--c-accent);
+    background: var(--c-accent-soft);
+  }
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform $dur var(--ease-out);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
 
 // 参考答案封印：阴阳玉印章
@@ -179,18 +204,16 @@ onBeforeUnmount(() => {
   display: inline-block;
   width: 15px;
   height: 15px;
-  margin-right: 0.375rem;
   color: var(--c-accent);
   vertical-align: -2.5px;
 }
 
 .answerBox {
+  margin-top: 0.75rem;
   padding: 1rem 1.25rem;
   border-left: 3px solid var(--c-accent);
   border-radius: 0 var(--r-sm) var(--r-sm) 0;
   background: var(--c-accent-soft);
-  color: var(--c-ink);
-  line-height: 1.7;
 }
 
 .attach {
@@ -244,6 +267,18 @@ onBeforeUnmount(() => {
   .dialog {
     transition: transform $dur-slow var(--ease-spring), opacity $dur-slow var(--ease-out);
   }
+}
+
+// 参考答案折叠过渡
+.answer-enter-active,
+.answer-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.answer-enter-from,
+.answer-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
 }
 
 :global(.modal-enter-from),

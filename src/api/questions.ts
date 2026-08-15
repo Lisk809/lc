@@ -1,12 +1,12 @@
 import { http } from './http'
 import type { Paginated, PaginationParams, Question } from '@/types'
 
-/** GET /api/questions（answer 仅作者可见，非作者为 null） */
+/** GET /api/questions */
 export function fetchQuestions(params: PaginationParams) {
   return http.get<Paginated<Question>>('/api/questions', { params })
 }
 
-/** POST /api/questions（multipart/form-data：title / content / options(JSON 字符串) / answer / file） */
+/** POST /api/questions（multipart/form-data：title / content(markdown) / answer(markdown) / file） */
 export function createQuestion(form: FormData, onProgress?: (percent: number) => void) {
   return http.post<Question>('/api/questions', form, {
     onUploadProgress: (e) => {

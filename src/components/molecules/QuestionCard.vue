@@ -7,21 +7,12 @@ const props = defineProps<{ question: Question }>()
 const emit = defineEmits<{ open: [question: Question] }>()
 
 const excerpt = computed(() => stripMarkdown(props.question.content, 110))
-const preview = computed(() => props.question.options.slice(0, 2))
-const moreCount = computed(() => Math.max(0, props.question.options.length - 2))
 </script>
 
 <template>
   <button type="button" :class="$style.card" @click="emit('open', question)">
     <h3 :class="$style.title">{{ question.title }}</h3>
     <p :class="$style.excerpt">{{ excerpt }}</p>
-    <ul :class="$style.options">
-      <li v-for="(opt, i) in preview" :key="i" :class="$style.option">
-        <span :class="$style.letter">{{ String.fromCharCode(65 + i) }}</span>
-        <span :class="$style.optionText">{{ opt }}</span>
-      </li>
-      <li v-if="moreCount > 0" :class="$style.more">另有 {{ moreCount }} 个选项</li>
-    </ul>
     <div :class="$style.meta">
       <span :class="$style.authorName">{{ question.author?.username || shortId(question.user_id) }}</span>
       <time :class="$style.time">{{ formatRelativeTime(question.created_at) }}</time>
@@ -69,50 +60,9 @@ const moreCount = computed(() => Math.max(0, props.question.options.length - 2))
 }
 
 .excerpt {
-  @include line-clamp(2);
+  @include line-clamp(3);
   color: var(--c-steel);
   font-size: 0.9375rem;
-}
-
-.options {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 0.375rem;
-}
-
-.option {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.letter {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--r-full);
-  background: var(--c-accent-soft);
-  color: var(--c-accent);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.optionText {
-  @include line-clamp(1);
-  color: var(--c-steel);
-  font-size: 0.875rem;
-}
-
-.more {
-  color: var(--c-slate);
-  font-size: 0.8125rem;
 }
 
 .meta {
