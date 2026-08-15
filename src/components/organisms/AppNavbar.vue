@@ -110,6 +110,8 @@ function goLogin() {
                   <p :class="$style.menuEmail">{{ user.email || '—' }}</p>
                 </div>
                 <RouterLink to="/profile" :class="$style.menuItem" role="menuitem">个人中心</RouterLink>
+                <RouterLink v-if="user.isAdmin" to="/admin/grade" :class="$style.menuItem" role="menuitem">批改工作台</RouterLink>
+                <RouterLink v-if="user.isAdmin" to="/admin/statistics" :class="$style.menuItem" role="menuitem">统计看板</RouterLink>
                 <RouterLink v-if="user.isAdmin" to="/admin/announcement/create" :class="$style.menuItem" role="menuitem">发布公告</RouterLink>
                 <button type="button" :class="[$style.menuItem, $style.danger]" role="menuitem" @click="handleLogout">退出登录</button>
               </div>

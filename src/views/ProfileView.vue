@@ -3,9 +3,11 @@ import { ref, watch } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useUiStore } from '@/stores/ui'
 import { fetchMyFiles, fetchMyPosts, fetchMyQuestions } from '@/api/me'
+import { usePagedList } from '@/composables/usePagedList'
 import { formatBytes, formatDate, formatRelativeTime, shortId, stripMarkdown } from '@/utils/format'
-import type { MyPost, MyQuestion, Paginated, ProfileTab, UserFile } from '@/types'
+import type { MyPost, MyQuestion, ProfileTab, UserFile } from '@/types'
 import ProfileSidebar from '@/components/organisms/ProfileSidebar.vue'
+import MyAnalyticsPanel from '@/components/organisms/MyAnalyticsPanel.vue'
 import AppAvatar from '@/components/atoms/AppAvatar.vue'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -19,32 +21,7 @@ const ui = useUiStore()
 
 const activeTab = ref<ProfileTab>('info')
 
-// ---------- 通用分页列表 ----------
-
-function usePagedList<T>(fetchPage: (page: number) => Promise<Paginated<T>>) {
-  const items = ref<T[]>([])
-  const pagination = ref({ page: 1, pages: 0, total: 0 })
-  const loading = ref(false)
-  const error = ref(false)
-  const loaded = ref(false)
-
-  async function load(page = 1) {
-    loading.value = true
-    error.value = false
-    try {
-      const res = await fetchPage(page)
-      items.value = res.data
-      pagination.value = res.pagination
-      loaded.value = true
-    } catch {
-      error.value = true
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { items, pagination, loading, error, loaded, load }
-}
+// ---------- 通用分页列表（src/composables/usePagedList.ts） ----------
 
 const postsTab = usePagedList<MyPost>((page) => fetchMyPosts({ page, limit: 12 }))
 const questionsTab = usePagedList<MyQuestion>((page) => fetchMyQuestions({ page, limit: 12 }))
@@ -260,6 +237,11 @@ function onFileUploaded() {
               </template>
             </EmptyState>
           </div>
+        </section>
+
+        <!-- ============ 学情分析 ============ -->
+        <section v-else-if="activeTab === 'analytics'" v-reveal="40">
+          <MyAnalyticsPanel />
         </section>
 
         <!-- ============ 我的文件 ============ -->

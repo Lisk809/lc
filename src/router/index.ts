@@ -46,6 +46,18 @@ const router = createRouter({
           component: () => import('@/views/AnnouncementCreateView.vue'),
           meta: { requiresAuth: true, requiresAdmin: true, title: '发布公告' },
         },
+        {
+          path: 'admin/grade',
+          name: 'admin-grade',
+          component: () => import('@/views/AdminGradeView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true, title: '批改工作台' },
+        },
+        {
+          path: 'admin/statistics',
+          name: 'admin-statistics',
+          component: () => import('@/views/AdminStatisticsView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true, title: '统计看板' },
+        },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue'), meta: { requiresAuth: true, title: '个人中心' } },
       ],
     },

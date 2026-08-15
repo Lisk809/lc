@@ -181,6 +181,98 @@ export interface Question {
   created_at: number
 }
 
+// ---------------- 提交与批改（在线批改与学情分析系统） ----------------
+
+export type SubmissionStatus = 'pending' | 'graded'
+
+export interface Grade {
+  id: string
+  submission_id: string
+  grader_id: string
+  score: number
+  comment: string | null
+  created_at: number
+}
+
+/** 单题提交详情（含批改结果；grade 为 null 表示未批改） */
+export interface SubmissionDetail {
+  id: string
+  question_id: string
+  content: string | null
+  attachment_url: string | null
+  attachment_name: string | null
+  status: SubmissionStatus
+  grade: Grade | null
+  created_at: number
+  updated_at: number
+}
+
+/** 我的提交列表项（question_title 可能为 null：题目已删除） */
+export interface MySubmission {
+  id: string
+  question_id: string
+  question_title: string | null
+  status: SubmissionStatus
+  score: number | null
+  comment: string | null
+  created_at: number
+  updated_at: number
+  graded_at: number | null
+}
+
+/** 管理员批改队列条目（学生身份用 username，无学号字段） */
+export interface AdminQueueItem {
+  id: string
+  user_id: string
+  username: string
+  question_id: string
+  question_title: string | null
+  content: string | null
+  attachment_url: string | null
+  attachment_name: string | null
+  status: SubmissionStatus
+  created_at: number
+  updated_at: number
+  grade: Grade | null
+}
+
+/** POST /api/admin/submissions/:id/grade 响应 */
+export interface GradeResult {
+  id: string
+  submission_id: string
+  grader_id: string
+  score: number
+  comment: string | null
+  status: 'graded'
+  created_at: number
+}
+
+/** GET /api/admin/statistics/overview */
+export interface AdminOverview {
+  kpis: {
+    total_submissions: number
+    pending_submissions: number
+    graded_submissions: number
+    avg_score: number | null
+    students: number
+  }
+  score_distribution: { bucket: string; count: number }[]
+  question_difficulty: { question_id: string; title: string | null; avg_score: number; graded_count: number }[]
+  trend: { date: string; submitted: number; graded: number }[]
+}
+
+/** GET /api/me/statistics */
+export interface MyStatistics {
+  summary: {
+    my_avg: number | null
+    global_avg: number | null
+    graded_count: number
+    total_submissions: number
+  }
+  per_question: { question_id: string; title: string | null; score: number; global_avg: number | null }[]
+  last_grades: { question_id: string; title: string | null; score: number; created_at: number }[]
+}
+
 // ---------------- 文件 ----------------
 
 export interface UploadResult {
@@ -213,4 +305,4 @@ export interface ToastItem {
   type: ToastType
 }
 
-export type ProfileTab = 'info' | 'posts' | 'questions' | 'files'
+export type ProfileTab = 'info' | 'posts' | 'questions' | 'files' | 'analytics'

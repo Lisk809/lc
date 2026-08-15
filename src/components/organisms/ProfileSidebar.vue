@@ -13,6 +13,7 @@ const tabs: { key: ProfileTab; label: string }[] = [
   { key: 'posts', label: '我的帖子' },
   { key: 'questions', label: '我的题目' },
   { key: 'files', label: '我的文件' },
+  { key: 'analytics', label: '学情分析' },
 ]
 </script>
 

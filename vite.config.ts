@@ -37,6 +37,8 @@ export default defineConfig({
         manualChunks: {
           'md-editor': ['md-editor-v3'],
           vue: ['vue', 'vue-router', 'pinia'],
+          echarts: ['echarts'],
+          pdfjs: ['pdfjs-dist'],
         },
       },
     },

@@ -10,10 +10,14 @@ import type { UploadResult } from '@/types'
  * mode="select"：仅选择校验，emit select(file|null)，随表单一起提交（帖子/回复/题目附件）
  * mode="upload"：立即上传至 /api/upload，emit uploaded(result)（个人中心文件上传）
  */
-const props = withDefaults(defineProps<{ mode?: 'select' | 'upload'; compact?: boolean }>(), {
-  mode: 'select',
-  compact: false,
-})
+const props = withDefaults(
+  defineProps<{ mode?: 'select' | 'upload'; compact?: boolean; accept?: string[] }>(),
+  {
+    mode: 'select',
+    compact: false,
+    accept: undefined,
+  },
+)
 
 const emit = defineEmits<{
   select: [file: File | null]
@@ -32,11 +36,13 @@ const activeName = ref('')
 
 const ALLOWED = ['.csv', '.json', '.parquet', '.pdf', '.png', '.jpg', '.jpeg']
 const MAX_BYTES = 10 * 1024 * 1024 // 与后端 MAX_FILE_BYTES 默认值一致
+/** 实际允许的后缀（默认全部；可用 accept 收窄，如答卷仅允许 .pdf） */
+const allowedExts = props.accept ?? ALLOWED
 
 function validate(file: File): string | null {
   const name = file.name.toLowerCase()
-  if (!ALLOWED.some((ext) => name.endsWith(ext))) {
-    return '不支持的文件格式（允许 .csv .json .parquet .pdf .png .jpg .jpeg）'
+  if (!allowedExts.some((ext) => name.endsWith(ext))) {
+    return `不支持的文件格式（允许 ${allowedExts.join(' ')}）`
   }
   if (file.size > MAX_BYTES) return '文件超过 10MB 限制'
   return null
@@ -95,6 +101,7 @@ function reset() {
     <input
       ref="inputRef"
       type="file"
+      :accept="allowedExts.join(',')"
       :class="$style.input"
       tabindex="-1"
       aria-hidden="true"
@@ -140,7 +147,7 @@ function reset() {
         <template v-if="compact">点击选择附件</template>
         <template v-else>拖拽文件到此处，或点击选择</template>
       </span>
-      <span v-if="!compact" :class="$style.constraints">.csv .json .parquet .pdf .png .jpg .jpeg · 不超过 10MB</span>
+      <span v-if="!compact" :class="$style.constraints">{{ allowedExts.join(' ') }} · 不超过 10MB</span>
     </button>
   </div>
 </template>
