@@ -63,18 +63,7 @@ export const useUserStore = defineStore('user', {
       this.bio = me.bio ?? ''
       this.createdAt = me.created_at
       this.badges = me.badges ?? []
-      this.isAdmin = me.is_admin
-      this.applyAdminMock()
-    },
-
-    /** 开发环境 Mock 管理员（VITE_ADMIN_OVERRIDE），生产环境自动跳过 */
-    applyAdminMock() {
-      const override = import.meta.env.DEV && import.meta.env.VITE_ADMIN_OVERRIDE === 'true'
-      const scopedId = import.meta.env.VITE_ADMIN_USER_ID
-      if (override && (!scopedId || scopedId === this.id)) {
-        this.isAdmin = true
-        console.info('[mock] VITE_ADMIN_OVERRIDE：当前用户已模拟为管理员')
-      }
+      this.isAdmin = me.is_admin ?? false
     },
 
     /** PATCH /api/me：字段使用 avatar（后端兼容 avatar_url 过渡） */

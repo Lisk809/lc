@@ -28,10 +28,8 @@ npm run preview  # 预览生产构建
 | 变量 | 开发（.env.development） | 生产（.env.production） |
 | --- | --- | --- |
 | `VITE_API_BASE` | `http://localhost:8787` | `https://lc.lisks.icu` |
-| `VITE_ADMIN_OVERRIDE` | `true`（Mock 管理员） | `false` |
-| `VITE_ADMIN_USER_ID` | 可选：限定 Mock 生效的用户 ID | — |
 
-`VITE_ADMIN_OVERRIDE=true` 时（仅 DEV），登录后在 `fetchMe` 后自动将当前用户标记为管理员，便于本地调试管理端功能（发布公告）。
+管理员身份由后端 Secret（`ADMIN_USER_IDS`）判定，通过 `/api/me` 的 `is_admin` 字段下发，前端不再需要 Mock。
 
 ## 目录结构
 
