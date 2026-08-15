@@ -3,6 +3,7 @@ import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { AxiosError } from 'axios'
 import { useUserStore } from '@/stores/user'
+import { useTurnstile } from '@/composables/useTurnstile'
 import type { ApiErrorBody } from '@/types'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -14,6 +15,9 @@ const form = reactive({ username: '', email: '', password: '', confirm: '' })
 const error = ref('')
 const loading = ref(false)
 const attempted = ref(false)
+
+const widgetEl = ref<HTMLElement | null>(null)
+const { token, reset } = useTurnstile(widgetEl, import.meta.env.VITE_TURNSTILE_SITE_KEY)
 
 const emailError = computed(() => {
   if (!attempted.value && !form.email) return ''
@@ -39,6 +43,10 @@ async function submit() {
     error.value = '请检查表单填写'
     return
   }
+  if (!token.value) {
+    error.value = '请先完成人机验证'
+    return
+  }
   loading.value = true
   error.value = ''
   try {
@@ -47,9 +55,12 @@ async function submit() {
       username: form.username.trim(),
       email: form.email.trim(),
       password: form.password,
+      turnstile_token: token.value,
     })
     router.push('/')
   } catch (e) {
+    // token 一次性：任何失败（含 409 重复用户名）后都需重新人机验证
+    reset()
     const message = (e as AxiosError<ApiErrorBody>).response?.data?.error
     error.value = typeof message === 'string' ? message : '注册失败，请稍后重试'
   } finally {
@@ -70,6 +81,8 @@ async function submit() {
       <BaseInput v-model="form.email" label="邮箱" type="email" placeholder="you@example.com" autocomplete="email" :error="emailError || undefined" />
       <BaseInput v-model="form.password" label="密码" type="password" placeholder="至少 6 位" autocomplete="new-password" :error="passwordError || undefined" />
       <BaseInput v-model="form.confirm" label="确认密码" type="password" placeholder="再次输入密码" autocomplete="new-password" :error="confirmError || undefined" />
+
+      <div ref="widgetEl" :class="$style.turnstile" />
 
       <div v-if="error" :class="$style.formError" role="alert">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
@@ -109,6 +122,10 @@ async function submit() {
 .form {
   display: grid;
   gap: 1.25rem;
+}
+
+.turnstile {
+  margin-top: 0.25rem;
 }
 
 .formError {

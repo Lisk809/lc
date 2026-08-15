@@ -1,5 +1,5 @@
 // ============================================================
-// API 数据类型 — 与 api.md v1.1 对齐
+// API 数据类型 — 与 api.md v1.2 对齐
 // ============================================================
 
 /** 通用分页响应 */
@@ -29,6 +29,8 @@ export interface RegisterPayload {
   username: string
   email: string
   password: string
+  /** Cloudflare Turnstile 客户端令牌（必填） */
+  turnstile_token: string
 }
 
 export interface LoginPayload {
