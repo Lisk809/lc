@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { AxiosError } from 'axios'
 import { useUserStore } from '@/stores/user'
 import { useTurnstile } from '@/composables/useTurnstile'
+import { checkPwnedPassword } from '@/utils/pwnedPassword'
 import type { ApiErrorBody } from '@/types'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -15,6 +16,10 @@ const form = reactive({ username: '', email: '', password: '', confirm: '' })
 const error = ref('')
 const loading = ref(false)
 const attempted = ref(false)
+const pwnedCount = ref(0)
+
+// 修改密码后清除泄露提示
+watch(() => form.password, () => { pwnedCount.value = 0 })
 
 const widgetEl = ref<HTMLElement | null>(null)
 const { token, reset } = useTurnstile(widgetEl, import.meta.env.VITE_TURNSTILE_SITE_KEY)
@@ -43,13 +48,21 @@ async function submit() {
     error.value = '请检查表单填写'
     return
   }
-  if (!token.value) {
-    error.value = '请先完成人机验证'
-    return
-  }
   loading.value = true
   error.value = ''
   try {
+    // Pwned Passwords 泄露检查：命中则阻止注册并提示更换（服务不可用时放行）
+    const count = await checkPwnedPassword(form.password)
+    if (count > 0) {
+      pwnedCount.value = count
+      loading.value = false
+      return
+    }
+    if (!token.value) {
+      error.value = '请先完成人机验证'
+      loading.value = false
+      return
+    }
     // 注册成功后自动登录
     await user.register({
       username: form.username.trim(),
@@ -81,6 +94,11 @@ async function submit() {
       <BaseInput v-model="form.email" label="邮箱" type="email" placeholder="you@example.com" autocomplete="email" :error="emailError || undefined" />
       <BaseInput v-model="form.password" label="密码" type="password" placeholder="至少 6 位" autocomplete="new-password" :error="passwordError || undefined" />
       <BaseInput v-model="form.confirm" label="确认密码" type="password" placeholder="再次输入密码" autocomplete="new-password" :error="confirmError || undefined" />
+
+      <div v-if="pwnedCount > 0" :class="$style.pwnedWarning" role="alert">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
+        此密码已在 {{ pwnedCount }} 起数据泄露中出现，极易被撞库攻击，请更换一个更强的密码
+      </div>
 
       <div ref="widgetEl" :class="$style.turnstile" />
 
@@ -128,7 +146,8 @@ async function submit() {
   margin-top: 0.25rem;
 }
 
-.formError {
+.formError,
+.pwnedWarning {
   display: flex;
   align-items: center;
   gap: 0.5rem;
