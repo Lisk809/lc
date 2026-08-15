@@ -166,8 +166,6 @@ onBeforeUnmount(() => {
             <!-- 高光：独立混合层，单独计算（跟手光斑 + 边界高光弧线） -->
             <div :class="$style.glare" aria-hidden="true">
               <div :class="$style.glowWide" />
-              <div :class="$style.glowCore" />
-              <div :class="$style.glowRim" />
             </div>
           </div>
 
@@ -370,29 +368,13 @@ onBeforeUnmount(() => {
 
 // 大面积柔光晕（半径 px：见 .backSheen 注释；30% ≈ 440×293 对角基准 374px 的 30%）
 .glowWide {
-  background: radial-gradient(circle 112px at var(--lx, 50%) var(--ly, 42%), rgba(255, 255, 255, 0.2), transparent 68%);
+  background: radial-gradient(circle 112px at var(--lx, 50%) var(--ly, 42%), rgba(255, 255, 255, 0.4), transparent 68%);
 }
 
-// 中心亮核
-.glowCore {
-  background: radial-gradient(circle 37px at var(--lx, 50%) var(--ly, 42%), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.14) 52%, transparent 70%);
-}
+
 
 // 光晕边界：一段高光实线弧，沿边缘渐细、两端消失（现实卡面照光的边界感）
 // 注意：--rim-r 不能含百分比（max(58px, 15%) 会让 mask 整体失效，扇形裸奔）
-.glowRim {
-  --rim-r: 58px;
-  background: conic-gradient(
-    at var(--lx, 50%) var(--ly, 42%),
-    transparent 0deg,
-    transparent 210deg,
-    rgba(255, 255, 255, 0.95) 255deg,
-    rgba(255, 255, 255, 0.95) 345deg,
-    transparent 395deg
-  );
-  -webkit-mask: radial-gradient(circle var(--rim-r) at var(--lx, 50%) var(--ly, 42%), transparent calc(100% - 6px), rgba(0, 0, 0, 0.55) calc(100% - 3px), rgba(0, 0, 0, 0.95) calc(100% - 1.5px), transparent 100%);
-  mask: radial-gradient(circle var(--rim-r) at var(--lx, 50%) var(--ly, 42%), transparent calc(100% - 6px), rgba(0, 0, 0, 0.55) calc(100% - 3px), rgba(0, 0, 0, 0.95) calc(100% - 1.5px), transparent 100%);
-}
 
 // ---- 浮动投影（卡底与主页平面之间） ----
 .cardShadow {
