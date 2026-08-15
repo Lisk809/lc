@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { AxiosError } from 'axios'
-import { useUserStore } from '@/stores/user'
+import { useUserStore, getRememberPref } from '@/stores/user'
 import type { ApiErrorBody } from '@/types'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -12,6 +12,7 @@ const router = useRouter()
 const user = useUserStore()
 
 const form = reactive({ username: '', password: '' })
+const remember = ref(getRememberPref())
 const error = ref('')
 const loading = ref(false)
 
@@ -23,7 +24,7 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    await user.login({ username: form.username.trim(), password: form.password })
+    await user.login({ username: form.username.trim(), password: form.password }, remember.value)
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
     router.push(redirect)
   } catch (e) {
@@ -56,6 +57,11 @@ async function submit() {
         placeholder="输入密码"
         autocomplete="current-password"
       />
+
+      <label :class="$style.remember">
+        <input v-model="remember" type="checkbox" :class="$style.rememberBox" />
+        <span>记住我（保持登录状态）</span>
+      </label>
 
       <div v-if="error" :class="$style.formError" role="alert">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></svg>
@@ -95,6 +101,29 @@ async function submit() {
 .form {
   display: grid;
   gap: 1.25rem;
+}
+
+.remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  color: var(--c-steel);
+  font-size: 0.875rem;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    color: var(--c-ink);
+  }
+}
+
+.rememberBox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--c-accent);
+  cursor: pointer;
 }
 
 .formError {

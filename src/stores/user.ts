@@ -27,15 +27,43 @@ const initialState = (): UserState => ({
   isAdmin: false,
 })
 
+// ---------- 会话持久化 ----------
+// 「记住我」勾选 → localStorage（跨会话保持登录）；未勾选 → sessionStorage（关浏览器即失效）
+const STORAGE_KEY = 'lunacho-user'
+const REMEMBER_KEY = 'lunacho-remember'
+
+function readPersistedUser(): Partial<UserState> {
+  const raw = localStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(STORAGE_KEY)
+  if (!raw) return {}
+  try {
+    return JSON.parse(raw) as Partial<UserState>
+  } catch {
+    return {}
+  }
+}
+
+function persistUser(state: UserState, remember: boolean) {
+  const { token, id, username, email, avatar, bio, createdAt, badges, isAdmin } = state
+  const data = JSON.stringify({ token, id, username, email, avatar, bio, createdAt, badges, isAdmin })
+  ;(remember ? localStorage : sessionStorage).setItem(STORAGE_KEY, data)
+  if (!remember) localStorage.removeItem(STORAGE_KEY)
+  localStorage.setItem(REMEMBER_KEY, remember ? '1' : '0')
+}
+
+/** 上次登录是否勾选了「记住我」（登录表单勾选框默认值） */
+export function getRememberPref(): boolean {
+  return localStorage.getItem(REMEMBER_KEY) !== '0'
+}
+
 export const useUserStore = defineStore('user', {
-  state: initialState,
+  state: () => ({ ...initialState(), ...readPersistedUser() }),
   getters: {
     isLoggedIn: (state) => Boolean(state.token),
     displayName: (state) => state.username || state.email || '访客',
   },
   actions: {
-    /** 登录：保存 token 与基础信息，并拉取完整资料 */
-    async login(payload: LoginPayload) {
+    /** 登录：remember=true 时跨会话保持登录，否则仅本次会话有效 */
+    async login(payload: LoginPayload, remember = true) {
       const res = await apiLogin(payload)
       this.token = res.token
       this.id = res.user.id
@@ -46,9 +74,10 @@ export const useUserStore = defineStore('user', {
       } catch {
         // 资料拉取失败不阻断登录（基础信息已就绪）
       }
+      persistUser(this.$state, remember)
     },
 
-    /** 注册成功后自动登录 */
+    /** 注册成功后自动登录（默认记住） */
     async register(payload: RegisterPayload) {
       await apiRegister(payload)
       await this.login({ username: payload.username, password: payload.password })
@@ -74,10 +103,9 @@ export const useUserStore = defineStore('user', {
     },
 
     logout() {
+      localStorage.removeItem(STORAGE_KEY)
+      sessionStorage.removeItem(STORAGE_KEY)
       this.$reset()
     },
-  },
-  persist: {
-    key: 'lunacho-user',
   },
 })
