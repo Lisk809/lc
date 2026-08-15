@@ -83,8 +83,8 @@ onBeforeUnmount(() => {
 
           <footer :class="$style.foot">
             <span :class="$style.author">
-              <AppAvatar :name="question.user_id" :size="22" />
-              {{ shortId(question.user_id) }}
+              <AppAvatar :name="question.author?.username || question.user_id" :url="question.author?.avatar_url" :size="22" />
+              {{ question.author?.username || shortId(question.user_id) }}
             </span>
             <time :class="$style.time">{{ formatDate(question.created_at) }}</time>
           </footer>
@@ -227,7 +227,6 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--c-steel);
-  font-family: var(--font-mono);
   font-size: var(--fs-meta);
 }
 

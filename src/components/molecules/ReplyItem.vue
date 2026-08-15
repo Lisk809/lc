@@ -13,8 +13,8 @@ const fileName = props.reply.attachment_url ? fileNameFromUrl(props.reply.attach
   <article :class="$style.reply">
     <div :class="$style.head">
       <span :class="$style.author">
-        <AppAvatar :name="reply.user_id" :size="32" />
-        <span :class="$style.authorId">{{ shortId(reply.user_id) }}</span>
+        <AppAvatar :name="reply.author?.username || reply.user_id" :url="reply.author?.avatar_url" :size="32" />
+        <span :class="$style.authorName">{{ reply.author?.username || shortId(reply.user_id) }}</span>
       </span>
       <time :class="$style.time">{{ formatRelativeTime(reply.created_at) }}</time>
     </div>
@@ -56,8 +56,7 @@ const fileName = props.reply.attachment_url ? fileNameFromUrl(props.reply.attach
   gap: 0.5rem;
 }
 
-.authorId {
-  font-family: var(--font-mono);
+.authorName {
   font-size: var(--fs-meta);
   color: var(--c-steel);
 }

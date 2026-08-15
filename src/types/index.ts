@@ -23,6 +23,13 @@ export interface ApiErrorBody {
   error?: string
 }
 
+/** 作者信息（后端 join users 表返回，帖子/回复/题目/公告通用；用户已删除时为 null） */
+export interface Author {
+  id: string
+  username: string
+  avatar_url: string | null
+}
+
 // ---------------- 认证 ----------------
 
 export interface RegisterPayload {
@@ -118,6 +125,7 @@ export interface Post {
   title: string
   content: string
   user_id: string
+  author: Author | null
   reply_count: number
   likes_count: number
   attachment_url: string | null
@@ -130,6 +138,7 @@ export interface PostCreateResult {
   title: string
   content: string
   user_id: string
+  author: Author | null
   attachment_url: string | null
   created_at: number
 }
@@ -138,6 +147,7 @@ export interface Reply {
   id: string
   content: string
   user_id: string
+  author: Author | null
   post_id?: string
   attachment_url: string | null
   created_at: number
@@ -148,6 +158,7 @@ export interface ReplyCreateResult {
   id: string
   content: string
   user_id: string
+  author: Author | null
   post_id: string
   attachment_url: string | null
   created_at: number
@@ -168,6 +179,7 @@ export interface Question {
   /** 仅作者可见，非作者为 null（后端保证） */
   answer: string | null
   user_id: string
+  author: Author | null
   attachment_url: string | null
   created_at: number
 }
@@ -190,6 +202,7 @@ export interface Announcement {
   title: string
   content: string
   author_id: string
+  author: Author | null
   created_at: number
 }
 

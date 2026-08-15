@@ -92,7 +92,7 @@ onMounted(() => void load())
           </button>
           <div v-if="expandedId === item.id" :class="$style.rowBody">
             <MarkdownView :content="item.content" />
-            <p :class="$style.author">发布者 · {{ shortId(item.author_id) }}</p>
+            <p :class="$style.author">发布者 · {{ item.author?.username || shortId(item.author_id) }}</p>
           </div>
         </article>
       </template>
@@ -230,7 +230,6 @@ onMounted(() => void load())
   margin-top: 1rem;
   padding-top: 0.875rem;
   border-top: 1px solid var(--c-border);
-  font-family: var(--font-mono);
   font-size: var(--fs-meta);
   color: var(--c-slate);
 }

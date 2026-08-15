@@ -23,7 +23,7 @@ const moreCount = computed(() => Math.max(0, props.question.options.length - 2))
       <li v-if="moreCount > 0" :class="$style.more">另有 {{ moreCount }} 个选项</li>
     </ul>
     <div :class="$style.meta">
-      <span :class="$style.authorId">{{ shortId(question.user_id) }}</span>
+      <span :class="$style.authorName">{{ question.author?.username || shortId(question.user_id) }}</span>
       <time :class="$style.time">{{ formatRelativeTime(question.created_at) }}</time>
       <svg
         v-if="question.attachment_url"
@@ -123,7 +123,10 @@ const moreCount = computed(() => Math.max(0, props.question.options.length - 2))
   color: var(--c-slate);
 }
 
-.authorId,
+.authorName {
+  font-size: var(--fs-meta);
+}
+
 .time {
   font-family: var(--font-mono);
   font-size: var(--fs-meta);

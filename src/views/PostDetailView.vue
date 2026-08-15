@@ -134,8 +134,8 @@ function changeRepliesPage(page: number) {
           <h1 :class="$style.title">{{ postStore.detail.title }}</h1>
           <div :class="$style.meta">
             <span :class="$style.author">
-              <AppAvatar :name="postStore.detail.user_id" :size="34" />
-              <span :class="$style.authorId">{{ shortId(postStore.detail.user_id) }}</span>
+              <AppAvatar :name="postStore.detail.author?.username || postStore.detail.user_id" :url="postStore.detail.author?.avatar_url" :size="34" />
+              <span :class="$style.authorName">{{ postStore.detail.author?.username || shortId(postStore.detail.user_id) }}</span>
             </span>
             <time :class="$style.time">{{ formatDate(postStore.detail.created_at) }}</time>
           </div>
@@ -170,9 +170,9 @@ function changeRepliesPage(page: number) {
           <div :class="$style.asideCard">
             <p :class="$style.asideLabel">AUTHOR</p>
             <div :class="$style.authorRow">
-              <AppAvatar :name="postStore.detail.user_id" :size="44" />
+              <AppAvatar :name="postStore.detail.author?.username || postStore.detail.user_id" :url="postStore.detail.author?.avatar_url" :size="44" />
               <div>
-                <p :class="$style.authorName">{{ shortId(postStore.detail.user_id) }}</p>
+                <p :class="$style.authorName">{{ postStore.detail.author?.username || shortId(postStore.detail.user_id) }}</p>
                 <p :class="$style.authorSub">帖子 #{{ shortId(postStore.detail.id) }}</p>
               </div>
             </div>
@@ -320,8 +320,7 @@ function changeRepliesPage(page: number) {
   gap: 0.5rem;
 }
 
-.authorId {
-  font-family: var(--font-mono);
+.authorName {
   font-size: var(--fs-meta);
   color: var(--c-steel);
 }
@@ -430,7 +429,6 @@ function changeRepliesPage(page: number) {
 }
 
 .authorName {
-  font-family: var(--font-mono);
   font-size: var(--fs-meta);
   font-weight: 500;
 }

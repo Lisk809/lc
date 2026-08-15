@@ -15,8 +15,8 @@ const excerpt = computed(() => stripMarkdown(props.post.content, 120))
     <p :class="$style.excerpt">{{ excerpt }}</p>
     <div :class="$style.meta">
       <span :class="$style.author">
-        <AppAvatar :name="post.user_id" :size="22" />
-        <span :class="$style.authorId">{{ shortId(post.user_id) }}</span>
+        <AppAvatar :name="post.author?.username || post.user_id" :url="post.author?.avatar_url" :size="22" />
+        <span :class="$style.authorName">{{ post.author?.username || shortId(post.user_id) }}</span>
       </span>
       <time :class="$style.time">{{ formatRelativeTime(post.created_at) }}</time>
       <span :class="$style.stats">
@@ -83,8 +83,7 @@ const excerpt = computed(() => stripMarkdown(props.post.content, 120))
   min-width: 0;
 }
 
-.authorId {
-  font-family: var(--font-mono);
+.authorName {
   font-size: var(--fs-meta);
   color: var(--c-steel);
 }
