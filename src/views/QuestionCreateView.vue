@@ -42,7 +42,7 @@ async function submit() {
     if (answer.value.trim()) form.append('answer', answer.value.trim())
     if (file.value) form.append('file', file.value)
     await questionStore.createQuestion(form, (p) => (uploadProgress.value = p))
-    ui.toast('题目已创建', 'success')
+    ui.toast('题目已创建（草稿），可在题库详情中发布', 'success')
     router.push('/questions')
   } catch {
     // 拦截器已提示
@@ -56,7 +56,7 @@ async function submit() {
   <div :class="$style.page">
     <header class="pageHead" v-reveal>
       <h1 class="pageTitle">创建题目</h1>
-      <p class="pageSub">题目与参考答案均支持 markdown。答案默认折叠，读者点击后展开。</p>
+      <p class="pageSub">题目与参考答案均支持 markdown。创建后默认为草稿，仅管理员可见，发布后全站开放。</p>
     </header>
 
     <form v-reveal="80" :class="$style.form" @submit.prevent="submit">

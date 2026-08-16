@@ -94,6 +94,7 @@ export interface MyQuestion {
   /** 本人题目，答案随行返回 */
   answer: string | null
   attachment_url: string | null
+  status: QuestionStatus
   created_at: number
 }
 
@@ -169,6 +170,8 @@ export interface LikeResult {
 
 // ---------------- 题目 ----------------
 
+export type QuestionStatus = 'draft' | 'published'
+
 export interface Question {
   id: string
   title: string
@@ -178,6 +181,8 @@ export interface Question {
   user_id: string
   author: Author | null
   attachment_url: string | null
+  /** draft 仅管理员可见且不可提交；published 全站可见 */
+  status: QuestionStatus
   created_at: number
 }
 

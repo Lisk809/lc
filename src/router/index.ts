@@ -37,7 +37,7 @@ const router = createRouter({
           path: 'questions/create',
           name: 'question-create',
           component: () => import('@/views/QuestionCreateView.vue'),
-          meta: { requiresAuth: true, title: '创建题目' },
+          meta: { requiresAuth: true, requiresAdmin: true, title: '创建题目' },
         },
         { path: 'announcements', name: 'announcements', component: () => import('@/views/AnnouncementsView.vue'), meta: { title: '公告' } },
         {

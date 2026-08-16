@@ -14,6 +14,7 @@ const excerpt = computed(() => stripMarkdown(props.question.content, 110))
     <h3 :class="$style.title">{{ question.title }}</h3>
     <p :class="$style.excerpt">{{ excerpt }}</p>
     <div :class="$style.meta">
+      <span v-if="question.status === 'draft'" :class="$style.draftBadge">未发布</span>
       <span :class="$style.authorName">{{ question.author?.username || shortId(question.user_id) }}</span>
       <time :class="$style.time">{{ formatRelativeTime(question.created_at) }}</time>
       <svg
@@ -75,6 +76,17 @@ const excerpt = computed(() => stripMarkdown(props.question.content, 110))
 
 .authorName {
   font-size: var(--fs-meta);
+}
+
+.draftBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--r-full);
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
 .time {

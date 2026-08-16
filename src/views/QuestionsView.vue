@@ -45,9 +45,9 @@ function goCreate() {
     <div :class="$style.head">
       <header class="pageHead" v-reveal>
         <h1 class="pageTitle">题库</h1>
-        <p class="pageSub">社区共建的竞赛题库。点击题目卡片查看详情，答案仅作者与管理员可见。</p>
+        <p class="pageSub">竞赛题库。新题默认为草稿，发布后对所有人可见；答案仅作者与管理员可见。</p>
       </header>
-      <BaseButton v-reveal="80" @click="goCreate">创建题目</BaseButton>
+      <BaseButton v-if="user.isAdmin" v-reveal="80" @click="goCreate">创建题目</BaseButton>
     </div>
 
     <div :class="$style.grid">
@@ -74,8 +74,11 @@ function goCreate() {
         </div>
       </template>
       <div v-else :class="$style.gridFull">
-        <EmptyState title="题库还是空的" description="创建第一道题目，为社区题库添砖加瓦。">
-          <template #action>
+        <EmptyState
+          :title="user.isAdmin ? '题库还是空的' : '暂无可练习的题目'"
+          :description="user.isAdmin ? '创建第一道题目，发布后对所有人可见。' : '等管理员发布题目后再来看看吧。'"
+        >
+          <template v-if="user.isAdmin" #action>
             <BaseButton @click="goCreate">创建题目</BaseButton>
           </template>
         </EmptyState>

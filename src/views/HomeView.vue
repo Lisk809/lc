@@ -115,7 +115,7 @@ function goCreateQuestion() {
             :enter="{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20, delay: 160 } }"
             :class="$style.heroSub"
           >
-            讨论真题、共建题库、分享讲义，第一时间获取备考公告。
+            讨论真题、刷题练手、分享讲义，第一时间获取备考公告。
           </p>
           <div
             v-motion
@@ -124,7 +124,7 @@ function goCreateQuestion() {
             :class="$style.heroActions"
           >
             <BaseButton size="lg" @click="router.push('/posts')">探索帖子</BaseButton>
-            <BaseButton size="lg" variant="ghost" @click="goCreateQuestion">创建题目</BaseButton>
+            <BaseButton v-if="user.isAdmin" size="lg" variant="ghost" @click="goCreateQuestion">创建题目</BaseButton>
           </div>
         </div>
 

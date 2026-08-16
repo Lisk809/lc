@@ -5,7 +5,8 @@ import { useUserStore } from '@/stores/user'
 import { useUiStore } from '@/stores/ui'
 import { fileNameFromUrl, formatDate, shortId } from '@/utils/format'
 import { fetchMySubmission, submitAnswer } from '@/api/submissions'
-import type { Question, SubmissionDetail } from '@/types'
+import { setQuestionStatus } from '@/api/questions'
+import type { Question, QuestionStatus, SubmissionDetail } from '@/types'
 import MarkdownView from '@/components/molecules/MarkdownView.vue'
 import AppAvatar from '@/components/atoms/AppAvatar.vue'
 import YinYangMark from '@/components/atoms/YinYangMark.vue'
@@ -40,6 +41,27 @@ const submitting = ref(false)
 
 function onFileSelected(file: File | null) {
   answerFile.value = file
+}
+
+// ---------- 发布/下线（管理员） ----------
+
+const statusUpdating = ref(false)
+
+async function toggleStatus() {
+  const q = props.question
+  if (!q || statusUpdating.value) return
+  const next: QuestionStatus = q.status === 'draft' ? 'published' : 'draft'
+  statusUpdating.value = true
+  try {
+    const res = await setQuestionStatus(q.id, next)
+    // 与题库列表项是同一引用，就地更新后卡片徽章自动同步
+    q.status = res.status
+    ui.toast(q.status === 'published' ? '题目已发布' : '题目已下线', 'success')
+  } catch {
+    // 拦截器已提示
+  } finally {
+    statusUpdating.value = false
+  }
 }
 
 async function loadSubmission(questionId: string) {
@@ -111,6 +133,14 @@ onBeforeUnmount(() => {
         <div :class="$style.dialog" role="dialog" aria-modal="true" :aria-label="question.title" tabindex="-1">
           <header :class="$style.head">
             <h3 :class="$style.title">{{ question.title }}</h3>
+            <BaseButton
+              v-if="user.isAdmin"
+              size="sm"
+              variant="outline"
+              :class="$style.publishBtn"
+              :loading="statusUpdating"
+              @click="toggleStatus"
+            >{{ question.status === 'draft' ? '发布' : '下线' }}</BaseButton>
             <button type="button" :class="$style.close" aria-label="关闭" @click="emit('close')">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
             </button>
@@ -173,7 +203,10 @@ onBeforeUnmount(() => {
                 <MarkdownView :content="submission.grade.comment" />
               </blockquote>
 
-              <template v-if="user.isLoggedIn">
+              <template v-if="question.status === 'draft'">
+                <p :class="$style.draftHint">该题尚未发布，暂不可提交答案</p>
+              </template>
+              <template v-else-if="user.isLoggedIn">
                 <div :class="$style.submitForm">
                   <BaseInput
                     v-model="textAnswer"
@@ -252,6 +285,12 @@ onBeforeUnmount(() => {
 .title {
   font-size: 1.25rem;
   letter-spacing: -0.01em;
+}
+
+.publishBtn {
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-top: 0.125rem;
 }
 
 .close {
@@ -432,6 +471,12 @@ onBeforeUnmount(() => {
 }
 
 .guestHint {
+  margin-top: 1rem;
+  color: var(--c-steel);
+  font-size: 0.875rem;
+}
+
+.draftHint {
   margin-top: 1rem;
   color: var(--c-steel);
   font-size: 0.875rem;
