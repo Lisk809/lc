@@ -3,8 +3,8 @@ import AppNavbar from '@/components/organisms/AppNavbar.vue'
 
 /** 页脚社交入口（simpleicons.org 图标）；TODO：替换为官方群/账号链接 */
 const socials = [
-  { key: 'qq', label: 'QQ 官方群', href: 'https://qm.qq.com/', brand: '#1EBAFC' },
-  { key: 'bilibili', label: 'Bilibili 官方账号', href: 'https://www.bilibili.com/', brand: '#00A1D6' },
+  { key: 'qq', label: 'QQ 官方群', href: 'https://qm.qq.com/q/J6cwq57niO', brand: '#1EBAFC' },
+  { key: 'bilibili', label: 'Bilibili 官方账号', href: 'https://space.bilibili.com/3632312667343431', brand: '#00A1D6' },
   // GitHub 品牌色 #181717 在暗色下不可见，darkBrand 用于暗色悬停
   { key: 'github', label: 'GitHub 开源仓库', href: 'https://github.com/LunaticChO', brand: '#181717', darkBrand: '#e6edf3' },
 ]
