@@ -63,7 +63,7 @@ const filters: { key: SubmissionStatus; label: string }[] = [
             <span :class="$style.user">{{ item.username }}</span>
             <span :class="$style.time">{{ formatRelativeTime(item.created_at) }}</span>
           </div>
-          <p :class="$style.title">{{ item.question_title || shortId(item.question_id) }}</p>
+          <p :class="$style.title">{{ item.exam_title || shortId(item.exam_id) }}</p>
           <span v-if="item.grade" :class="$style.score">{{ item.grade.score }} 分</span>
         </button>
       </template>

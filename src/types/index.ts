@@ -94,7 +94,6 @@ export interface MyQuestion {
   /** 本人题目，答案随行返回 */
   answer: string | null
   attachment_url: string | null
-  status: QuestionStatus
   created_at: number
 }
 
@@ -170,8 +169,6 @@ export interface LikeResult {
 
 // ---------------- 题目 ----------------
 
-export type QuestionStatus = 'draft' | 'published'
-
 export interface Question {
   id: string
   title: string
@@ -181,12 +178,27 @@ export interface Question {
   user_id: string
   author: Author | null
   attachment_url: string | null
-  /** draft 仅管理员可见且不可提交；published 全站可见 */
-  status: QuestionStatus
   created_at: number
 }
 
-// ---------------- 提交与批改（在线批改与学情分析系统） ----------------
+// ---------------- 联考（独立事件，仅管理员创建；只有联考有提交/批改） ----------------
+
+export type ExamStatus = 'draft' | 'published'
+
+export interface Exam {
+  id: string
+  title: string
+  /** 说明（markdown，可选） */
+  description: string | null
+  paper_url: string
+  paper_name: string
+  sheet_url: string
+  sheet_name: string
+  status: ExamStatus
+  created_at: number
+}
+
+// ---------------- 提交与批改（联考维度：一名学生每场联考最多一条） ----------------
 
 export type SubmissionStatus = 'pending' | 'graded'
 
@@ -199,10 +211,10 @@ export interface Grade {
   created_at: number
 }
 
-/** 单题提交详情（含批改结果；grade 为 null 表示未批改） */
+/** 单场联考提交详情（含批改结果；grade 为 null 表示未批改） */
 export interface SubmissionDetail {
   id: string
-  question_id: string
+  exam_id: string
   content: string | null
   attachment_url: string | null
   attachment_name: string | null
@@ -212,11 +224,11 @@ export interface SubmissionDetail {
   updated_at: number
 }
 
-/** 我的提交列表项（question_title 可能为 null：题目已删除） */
+/** 我的提交列表项（exam_title 可能为 null：联考已删除） */
 export interface MySubmission {
   id: string
-  question_id: string
-  question_title: string | null
+  exam_id: string
+  exam_title: string | null
   status: SubmissionStatus
   score: number | null
   comment: string | null
@@ -230,8 +242,8 @@ export interface AdminQueueItem {
   id: string
   user_id: string
   username: string
-  question_id: string
-  question_title: string | null
+  exam_id: string
+  exam_title: string | null
   content: string | null
   attachment_url: string | null
   attachment_name: string | null
@@ -262,7 +274,7 @@ export interface AdminOverview {
     students: number
   }
   score_distribution: { bucket: string; count: number }[]
-  question_difficulty: { question_id: string; title: string | null; avg_score: number; graded_count: number }[]
+  exam_difficulty: { exam_id: string; title: string | null; avg_score: number; graded_count: number }[]
   trend: { date: string; submitted: number; graded: number }[]
 }
 
@@ -274,8 +286,8 @@ export interface MyStatistics {
     graded_count: number
     total_submissions: number
   }
-  per_question: { question_id: string; title: string | null; score: number; global_avg: number | null }[]
-  last_grades: { question_id: string; title: string | null; score: number; created_at: number }[]
+  per_exam: { exam_id: string; title: string | null; score: number; global_avg: number | null }[]
+  last_grades: { exam_id: string; title: string | null; score: number; created_at: number }[]
 }
 
 // ---------------- 文件 ----------------

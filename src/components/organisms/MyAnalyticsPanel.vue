@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // 学生个人学情面板（嵌入个人中心「学情分析」tab，exam.md §5.2）
-// 题目暂无标签，雷达图按方案降级为「各题得失对比折线图」
+// 联考暂无标签，雷达图按方案降级为「各场联考得失对比折线图」
 import { nextTick, onMounted, ref } from 'vue'
 import { fetchMyStatistics, fetchMySubmissions } from '@/api/submissions'
 import { useCountUp } from '@/composables/useCountUp'
@@ -55,31 +55,31 @@ function shortTitle(title: string | null, id: string) {
 
 function renderCharts() {
   if (!stats.value) return
-  const { per_question, last_grades } = stats.value
+  const { per_exam, last_grades } = stats.value
 
-  if (per_question.length) {
+  if (per_exam.length) {
     gainChart.setOption({
       tooltip: { trigger: 'axis' },
       legend: { data: ['我的得分', '全局均分'] },
       grid: { left: 40, right: 20, top: 44, bottom: 64 },
       xAxis: {
         type: 'category',
-        data: per_question.map((p) => shortTitle(p.title, p.question_id)),
-        axisLabel: { interval: 0, rotate: per_question.length > 4 ? 30 : 0 },
+        data: per_exam.map((p) => shortTitle(p.title, p.exam_id)),
+        axisLabel: { interval: 0, rotate: per_exam.length > 4 ? 30 : 0 },
       },
       yAxis: { type: 'value', min: 0, max: 100 },
       series: [
         {
           name: '我的得分',
           type: 'line',
-          data: per_question.map((p) => p.score),
+          data: per_exam.map((p) => p.score),
           itemStyle: { color: '#dc3d3d' },
           lineStyle: { color: '#dc3d3d' },
         },
         {
           name: '全局均分',
           type: 'line',
-          data: per_question.map((p) => p.global_avg),
+          data: per_exam.map((p) => p.global_avg),
           itemStyle: { color: '#3b82f6' },
           lineStyle: { color: '#3b82f6' },
         },
@@ -156,12 +156,12 @@ const loadSubmissions = submissionsTab.load
         </div>
       </div>
       <p :class="$style.kpiMeta">
-        已批改 {{ stats.summary.graded_count }} 题 · 共提交 {{ stats.summary.total_submissions }} 次
+        已批改 {{ stats.summary.graded_count }} 场 · 共提交 {{ stats.summary.total_submissions }} 次
       </p>
 
-      <!-- 图表（题目无标签，雷达图降级为得失对比折线图） -->
-      <div v-if="stats.per_question.length" :class="$style.chartCard">
-        <p :class="$style.chartLabel">各题得失对比 · 我的得分 vs 全局均分</p>
+      <!-- 图表（联考无标签，雷达图降级为得失对比折线图） -->
+      <div v-if="stats.per_exam.length" :class="$style.chartCard">
+        <p :class="$style.chartLabel">各场联考得失对比 · 我的得分 vs 全局均分</p>
         <div ref="gainChartEl" :class="$style.chart" />
       </div>
       <div v-if="stats.last_grades.length" :class="$style.chartCard">
@@ -169,7 +169,7 @@ const loadSubmissions = submissionsTab.load
         <div ref="historyChartEl" :class="$style.chart" />
       </div>
       <div v-if="stats.summary.graded_count === 0" :class="$style.stateCard">
-        <EmptyState title="暂无批改记录" description="提交答案并等待管理员批改后，这里会展示你的学情分析。" />
+        <EmptyState title="暂无批改记录" description="提交答卷并等待管理员批改后，这里会展示你的学情分析。" />
       </div>
     </template>
 
@@ -196,7 +196,7 @@ const loadSubmissions = submissionsTab.load
       <div :class="$style.listCard">
         <div v-for="s in submissions" :key="s.id" :class="$style.item">
           <div :class="$style.itemMain">
-            <h4 :class="$style.itemTitle">{{ s.question_title || shortId(s.question_id) }}</h4>
+            <h4 :class="$style.itemTitle">{{ s.exam_title || shortId(s.exam_id) }}</h4>
             <p v-if="s.comment" :class="$style.itemSub">{{ stripMarkdown(s.comment, 80) }}</p>
           </div>
           <div :class="$style.itemAside">
@@ -216,7 +216,7 @@ const loadSubmissions = submissionsTab.load
       </div>
     </template>
     <div v-else :class="$style.stateCard">
-      <EmptyState title="还没有提交" description="在题库中打开题目即可提交答案。" />
+      <EmptyState title="还没有提交" description="在联考页打开联考即可提交答卷。" />
     </div>
   </div>
 </template>

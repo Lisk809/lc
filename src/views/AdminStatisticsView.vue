@@ -53,13 +53,13 @@ function scoreColor(avg: number) {
 }
 
 function shortTitle(title: string | null, id: string) {
-  const t = title || `题目 ${id.slice(0, 8)}`
+  const t = title || `联考 ${id.slice(0, 8)}`
   return t.length > 14 ? t.slice(0, 14) + '…' : t
 }
 
 function renderCharts() {
   if (!overview.value) return
-  const { score_distribution, question_difficulty, trend } = overview.value
+  const { score_distribution, exam_difficulty, trend } = overview.value
 
   // 分数分布柱状图（渐进蓝色）
   if (score_distribution.length) {
@@ -83,9 +83,9 @@ function renderCharts() {
     })
   }
 
-  // 题目难度横向条形图（后端已按平均分升序：最难在前）
-  if (question_difficulty.length) {
-    const rows = question_difficulty.slice(0, 20) // 最多展示 20 题，避免拥挤
+  // 联考难度横向条形图（后端已按平均分升序：最难在前）
+  if (exam_difficulty.length) {
+    const rows = exam_difficulty.slice(0, 20) // 最多展示 20 场，避免拥挤
     diffChart.setOption({
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { left: 8, right: 44, top: 12, bottom: 32, containLabel: true },
@@ -93,7 +93,7 @@ function renderCharts() {
       yAxis: {
         type: 'category',
         inverse: true,
-        data: rows.map((d) => shortTitle(d.title, d.question_id)),
+        data: rows.map((d) => shortTitle(d.title, d.exam_id)),
       },
       series: [
         {
@@ -197,7 +197,7 @@ function renderCharts() {
           <div ref="distEl" :class="$style.chart" />
         </div>
         <div :class="$style.chartCard">
-          <p :class="$style.chartLabel">题目难度（平均分升序）</p>
+          <p :class="$style.chartLabel">联考难度（平均分升序）</p>
           <div ref="diffEl" :class="$style.chart" />
         </div>
         <div :class="$style.chartCardWide">

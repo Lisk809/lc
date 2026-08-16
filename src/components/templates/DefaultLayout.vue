@@ -25,6 +25,7 @@ import AppNavbar from '@/components/organisms/AppNavbar.vue'
         <nav :class="$style.nav" aria-label="页脚导航">
           <RouterLink to="/posts">帖子</RouterLink>
           <RouterLink to="/questions">题库</RouterLink>
+          <RouterLink to="/exams">联考</RouterLink>
           <RouterLink to="/announcements">公告</RouterLink>
         </nav>
         <div :class="$style.bottom">

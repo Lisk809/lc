@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useQuestionStore } from '@/stores/questions'
+import { useExamStore } from '@/stores/exams'
 import { useUiStore } from '@/stores/ui'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -9,14 +9,14 @@ import MarkdownEditor from '@/components/molecules/MarkdownEditor.vue'
 import FileDropZone from '@/components/molecules/FileDropZone.vue'
 
 const router = useRouter()
-const questionStore = useQuestionStore()
+const examStore = useExamStore()
 const ui = useUiStore()
 
 const title = ref('')
-const content = ref('')
-/** 参考答案（markdown，'' 表示不设置） */
-const answer = ref('')
-const file = ref<File | null>(null)
+/** 说明（markdown，可选） */
+const description = ref('')
+const paperFile = ref<File | null>(null)
+const sheetFile = ref<File | null>(null)
 const uploadProgress = ref(0)
 const submitting = ref(false)
 const attempted = ref(false)
@@ -25,11 +25,15 @@ const submitError = ref('')
 async function submit() {
   attempted.value = true
   if (!title.value.trim()) {
-    submitError.value = '请填写标题'
+    submitError.value = '请填写联考标题'
     return
   }
-  if (!content.value.trim()) {
-    submitError.value = '请填写题目内容'
+  if (!paperFile.value) {
+    submitError.value = '试卷 PDF 为必传项'
+    return
+  }
+  if (!sheetFile.value) {
+    submitError.value = '答题卡 PDF 为必传项'
     return
   }
   submitError.value = ''
@@ -38,12 +42,12 @@ async function submit() {
   try {
     const form = new FormData()
     form.append('title', title.value.trim())
-    form.append('content', content.value.trim())
-    if (answer.value.trim()) form.append('answer', answer.value.trim())
-    if (file.value) form.append('file', file.value)
-    await questionStore.createQuestion(form, (p) => (uploadProgress.value = p))
-    ui.toast('题目已创建，已对所有人公开', 'success')
-    router.push('/questions')
+    if (description.value.trim()) form.append('description', description.value.trim())
+    form.append('paper', paperFile.value)
+    form.append('sheet', sheetFile.value)
+    await examStore.createExam(form, (p) => (uploadProgress.value = p))
+    ui.toast('联考创建成功（未发布）', 'success')
+    router.push('/exams')
   } catch {
     // 拦截器已提示
   } finally {
@@ -55,32 +59,33 @@ async function submit() {
 <template>
   <div :class="$style.page">
     <header class="pageHead" v-reveal>
-      <h1 class="pageTitle">创建题目</h1>
-      <p class="pageSub">题目与参考答案均支持 markdown，上传即公开。</p>
+      <h1 class="pageTitle">创建联考</h1>
+      <p class="pageSub">上传试卷与答题卡 PDF。创建后默认为未发布，发布后全站可见并开放答卷提交。</p>
     </header>
 
     <form v-reveal="80" :class="$style.form" @submit.prevent="submit">
       <BaseInput
         v-model="title"
         label="标题"
-        placeholder="一句话概括这道题"
-        :error="attempted && !title.trim() ? '请填写标题' : undefined"
+        placeholder="如：2026 暑假集训第一次联考"
+        :error="attempted && !title.trim() ? '请填写联考标题' : undefined"
       />
 
       <div :class="$style.field">
-        <label :class="$style.label">题目</label>
-        <MarkdownEditor v-model="content" />
-        <p v-if="attempted && !content.trim()" :class="$style.error">请填写题目内容</p>
+        <label :class="$style.label">说明（可选）</label>
+        <MarkdownEditor v-model="description" />
       </div>
 
       <div :class="$style.field">
-        <label :class="$style.label">参考答案（可选）</label>
-        <MarkdownEditor v-model="answer" />
+        <label :class="$style.label">试卷 PDF（必传）</label>
+        <FileDropZone mode="select" compact :accept="['.pdf']" @select="(f) => (paperFile = f)" />
+        <p v-if="attempted && !paperFile" :class="$style.error">试卷 PDF 为必传项</p>
       </div>
 
       <div :class="$style.field">
-        <label :class="$style.label">附件（可选）</label>
-        <FileDropZone mode="select" @select="(f) => (file = f)" />
+        <label :class="$style.label">答题卡 PDF（必传）</label>
+        <FileDropZone mode="select" compact :accept="['.pdf']" @select="(f) => (sheetFile = f)" />
+        <p v-if="attempted && !sheetFile" :class="$style.error">答题卡 PDF 为必传项</p>
       </div>
 
       <div v-if="uploadProgress > 0 && uploadProgress < 100" :class="$style.progressRow">
@@ -93,7 +98,7 @@ async function submit() {
       <div v-if="submitError" :class="$style.formError" role="alert">{{ submitError }}</div>
 
       <div :class="$style.actions">
-        <BaseButton type="submit" size="lg" :loading="submitting">创建题目</BaseButton>
+        <BaseButton type="submit" size="lg" :loading="submitting">创建联考</BaseButton>
       </div>
     </form>
   </div>

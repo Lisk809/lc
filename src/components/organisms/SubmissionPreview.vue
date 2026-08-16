@@ -31,7 +31,7 @@ watch(
   <div :class="$style.panel">
     <template v-if="item">
       <header :class="$style.head">
-        <h2 :class="$style.headTitle">{{ item.question_title || shortId(item.question_id) }}</h2>
+        <h2 :class="$style.headTitle">{{ item.exam_title || shortId(item.exam_id) }}</h2>
         <p :class="$style.headMeta">
           {{ item.username }} · {{ item.attachment_name || '文本答案' }}
         </p>

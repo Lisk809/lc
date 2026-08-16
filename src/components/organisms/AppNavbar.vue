@@ -16,6 +16,7 @@ const links = [
   { to: '/', label: '首页' },
   { to: '/posts', label: '帖子' },
   { to: '/questions', label: '题库' },
+  { to: '/exams', label: '联考' },
   { to: '/announcements', label: '公告' },
 ]
 

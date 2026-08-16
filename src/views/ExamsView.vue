@@ -1,28 +1,28 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useQuestionStore } from '@/stores/questions'
+import { useExamStore } from '@/stores/exams'
 import { useUserStore } from '@/stores/user'
-import type { Question } from '@/types'
-import QuestionCard from '@/components/molecules/QuestionCard.vue'
-import QuestionDetailModal from '@/components/molecules/QuestionDetailModal.vue'
+import type { Exam } from '@/types'
+import ExamCard from '@/components/molecules/ExamCard.vue'
+import ExamDetailModal from '@/components/molecules/ExamDetailModal.vue'
 import PaginationBar from '@/components/molecules/PaginationBar.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import SkeletonBox from '@/components/atoms/SkeletonBox.vue'
 import EmptyState from '@/components/atoms/EmptyState.vue'
 
 const router = useRouter()
-const questionStore = useQuestionStore()
+const examStore = useExamStore()
 const user = useUserStore()
 
-const selected = ref<Question | null>(null)
+const selected = ref<Exam | null>(null)
 
 onMounted(() => {
-  if (!questionStore.list.length) void questionStore.fetchList({ page: 1 })
+  if (!examStore.list.length) void examStore.fetchList({ page: 1 })
 })
 
-function openQuestion(question: Question) {
-  selected.value = question
+function openExam(exam: Exam) {
+  selected.value = exam
 }
 
 function closeModal() {
@@ -30,13 +30,8 @@ function closeModal() {
 }
 
 function changePage(page: number) {
-  void questionStore.fetchList({ page })
+  void examStore.fetchList({ page })
   window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function goCreate() {
-  if (user.isLoggedIn) router.push('/questions/create')
-  else router.push({ path: '/auth/login', query: { redirect: '/questions/create' } })
 }
 </script>
 
@@ -44,14 +39,14 @@ function goCreate() {
   <div :class="$style.page">
     <div :class="$style.head">
       <header class="pageHead" v-reveal>
-        <h1 class="pageTitle">题库</h1>
-        <p class="pageSub">社区共建的竞赛题库。上传即公开，人人可浏览；点击卡片查看题目与参考答案。</p>
+        <h1 class="pageTitle">联考</h1>
+        <p class="pageSub">独立的联考事件：下载试卷与答题卡，提交答卷 PDF，等待批改与统计。</p>
       </header>
-      <BaseButton v-reveal="80" @click="goCreate">创建题目</BaseButton>
+      <BaseButton v-if="user.isAdmin" v-reveal="80" @click="router.push('/exams/create')">创建联考</BaseButton>
     </div>
 
     <div :class="$style.grid">
-      <template v-if="questionStore.loading">
+      <template v-if="examStore.loading">
         <div v-for="i in 6" :key="i" :class="$style.skeletonCard">
           <SkeletonBox height="22px" width="70%" />
           <SkeletonBox height="16px" width="100%" />
@@ -59,27 +54,27 @@ function goCreate() {
           <SkeletonBox height="18px" width="45%" radius="999px" />
         </div>
       </template>
-      <template v-else-if="questionStore.error">
+      <template v-else-if="examStore.error">
         <div :class="$style.gridFull">
-          <EmptyState title="题库加载失败" description="网络似乎开小差了，稍后重试。">
+          <EmptyState title="联考加载失败" description="网络似乎开小差了，稍后重试。">
             <template #action>
-              <BaseButton variant="outline" @click="questionStore.fetchList()">重新加载</BaseButton>
+              <BaseButton variant="outline" @click="examStore.fetchList()">重新加载</BaseButton>
             </template>
           </EmptyState>
         </div>
       </template>
-      <template v-else-if="questionStore.list.length">
-        <div v-for="(q, i) in questionStore.list" :key="q.id" v-reveal="i * 40">
-          <QuestionCard :question="q" @open="openQuestion" />
+      <template v-else-if="examStore.list.length">
+        <div v-for="(e, i) in examStore.list" :key="e.id" v-reveal="i * 40">
+          <ExamCard :exam="e" @open="openExam" />
         </div>
       </template>
       <div v-else :class="$style.gridFull">
         <EmptyState
-          title="题库还是空的"
-          description="创建第一道题目，为社区题库添砖加瓦。"
+          :title="user.isAdmin ? '还没有联考' : '暂无进行中的联考'"
+          :description="user.isAdmin ? '创建一场联考，上传试卷与答题卡。' : '等管理员发布联考后再来看看吧。'"
         >
-          <template #action>
-            <BaseButton @click="goCreate">创建题目</BaseButton>
+          <template v-if="user.isAdmin" #action>
+            <BaseButton @click="router.push('/exams/create')">创建联考</BaseButton>
           </template>
         </EmptyState>
       </div>
@@ -87,14 +82,14 @@ function goCreate() {
 
     <div :class="$style.pagination">
       <PaginationBar
-        :page="questionStore.pagination.page"
-        :pages="questionStore.pagination.pages"
-        :total="questionStore.pagination.total"
+        :page="examStore.pagination.page"
+        :pages="examStore.pagination.pages"
+        :total="examStore.pagination.total"
         @change="changePage"
       />
     </div>
 
-    <QuestionDetailModal :question="selected" @close="closeModal" />
+    <ExamDetailModal :exam="selected" @close="closeModal" />
   </div>
 </template>
 

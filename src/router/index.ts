@@ -37,7 +37,14 @@ const router = createRouter({
           path: 'questions/create',
           name: 'question-create',
           component: () => import('@/views/QuestionCreateView.vue'),
-          meta: { requiresAuth: true, requiresAdmin: true, title: '创建题目' },
+          meta: { requiresAuth: true, title: '创建题目' },
+        },
+        { path: 'exams', name: 'exams', component: () => import('@/views/ExamsView.vue'), meta: { title: '联考' } },
+        {
+          path: 'exams/create',
+          name: 'exam-create',
+          component: () => import('@/views/ExamCreateView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true, title: '创建联考' },
         },
         { path: 'announcements', name: 'announcements', component: () => import('@/views/AnnouncementsView.vue'), meta: { title: '公告' } },
         {

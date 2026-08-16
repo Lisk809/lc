@@ -1,4 +1,4 @@
-// 提交与批改 API（在线批改与学情分析系统）
+// 提交与批改 API（联考维度）
 import { http } from './http'
 import type {
   AdminOverview,
@@ -8,19 +8,8 @@ import type {
   MySubmission,
   Paginated,
   PaginationParams,
-  SubmissionDetail,
   SubmissionStatus,
 } from '@/types'
-
-/** 提交答案（文本 Markdown 和/或 PDF 答卷；重交 = 覆盖并把状态打回待批改） */
-export function submitAnswer(questionId: string, form: FormData) {
-  return http.post<SubmissionDetail>(`/api/questions/${questionId}/submit`, form)
-}
-
-/** 我在该题下的提交（未提交时 submission 为 null） */
-export function fetchMySubmission(questionId: string) {
-  return http.get<{ submission: SubmissionDetail | null }>(`/api/questions/${questionId}/submission`)
-}
 
 /** 我的提交列表（含批改状态与得分） */
 export function fetchMySubmissions(params: PaginationParams) {
