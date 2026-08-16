@@ -13,7 +13,7 @@ const features = ['真题讨论与解析分享', '社区共建竞赛题库', '�
         </RouterLink>
 
         <div :class="$style.copy">
-          <p :class="$style.eyebrow">幻想郷 · 月の都 · 化学部</p>
+          <p :class="$style.eyebrow">幻想郷 · 化学部</p>
           <h1 :class="$style.tagline">讨论、题库与资料，化学竞赛的一站式社区</h1>
           <ul :class="$style.features">
             <li v-for="(f, i) in features" :key="f">
@@ -23,7 +23,7 @@ const features = ['真题讨论与解析分享', '社区共建竞赛题库', '�
           </ul>
         </div>
 
-        <p :class="$style.footNote">陰陽玉 · 苯环 · 社区标志</p>
+        <p :class="$style.footNote">陰陽玉 · 社区标志</p>
       </div>
     </aside>
 

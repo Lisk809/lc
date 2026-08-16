@@ -98,7 +98,7 @@ function goCreateQuestion() {
             :enter="{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20 } }"
             class="eyebrow"
           >
-            Lunatic ChO · 月之都 · 化学竞赛社区
+            Lunatic ChO · 化竞幻想乡 · 化学竞赛社区
           </p>
           <h1
             v-motion
@@ -151,7 +151,6 @@ function goCreateQuestion() {
             </div>
             <p :class="$style.visualCaption">
               <YinYangMark :class="$style.captionSeal" />
-              SPELL CARD · C₆H₆
             </p>
           </div>
         </div>

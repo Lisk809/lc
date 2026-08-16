@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Lunatic ChO 月之都化学竞赛社区前端 — Vue 3 + TypeScript + Vite",
+  "description": "Lunatic ChO 化学竞赛社区前端",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
