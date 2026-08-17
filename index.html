@@ -4,11 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="canonical" href="https://www.lunacho.top/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#f9fafb" />
     <meta
       name="description"
-      content="Lunatic ChO — 月之都的化学竞赛社区（ChO = 化学奥林匹克 · C·H·O）：帖子讨论、题库管理、文件资源共享、官方公告"
+      content="Lunatic ChO — 化竞幻想乡（ChO = 化学奥林匹克 · C·H·O）：帖子讨论、题库管理、文件资源共享、官方公告"
     />
-    <title>Lunatic ChO · 月之都化学竞赛社区</title>
+    <title>Lunatic ChO · 化竞幻想乡</title>
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="Lunatic ChO" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:url" content="https://www.lunacho.top/" />
+    <meta property="og:title" content="Lunatic ChO · 化竞幻想乡" />
+    <meta
+      property="og:description"
+      content="Lunatic ChO — 化竞幻想乡（ChO = 化学奥林匹克 · C·H·O）：帖子讨论、题库管理、文件资源共享、官方公告"
+    />
+    <meta property="og:image" content="https://www.lunacho.top/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="3600" />
+    <meta property="og:image:height" content="1890" />
+    <meta property="og:image:alt" content="Lunatic ChO 化竞幻想乡" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lunatic ChO · 化竞幻想乡" />
+    <meta
+      name="twitter:description"
+      content="Lunatic ChO — 化竞幻想乡（ChO = 化学奥林匹克 · C·H·O）：帖子讨论、题库管理、文件资源共享、官方公告"
+    />
+    <meta name="twitter:image" content="https://www.lunacho.top/og-image.png" />
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Lunatic ChO",
+        "alternateName": "化竞幻想乡",
+        "url": "https://www.lunacho.top/",
+        "inLanguage": "zh-CN",
+        "description": "Lunatic ChO — 化竞幻想乡：帖子讨论、题库管理、文件资源共享、官方公告"
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,7 +58,12 @@
       ;(function () {
         try {
           var s = JSON.parse(localStorage.getItem('lunacho-ui') || '{}')
-          if (s.isDark) document.documentElement.classList.add('dark')
+          if (s.isDark) {
+            document.documentElement.classList.add('dark')
+            // 浏览器导航栏颜色与暗色主题同步（与 uiStore.applyTheme 一致）
+            var tc = document.querySelector('meta[name="theme-color"]')
+            if (tc) tc.setAttribute('content', '#0e0e11')
+          }
         } catch (e) {
           /* ignore */
         }

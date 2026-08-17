@@ -31,7 +31,7 @@ if (userStore.token) {
 
 // 彩蛋：控制台问候（ChO 双关：化学奥林匹克 · 碳氢氧）
 console.log(
-  '%cLunatic ChO%c  月之都化学竞赛社区\nChO = Chemistry Olympiad · C·H·O 碳氢氧\n在页面任意处键入 "lunatic" 解锁 LUNATIC 难度',
+  '%cLunatic ChO%c  化竞幻想乡\nChO = Chemistry Olympiad · C·H·O 碳氢氧\n在页面任意处键入 "lunatic" 解锁 LUNATIC 难度',
   'font-family:"Clicker Script",cursive;font-size:30px;line-height:1.4;color:#dc3d3d;',
   'font-family:Outfit,sans-serif;font-size:12px;line-height:1.4;color:#71717a;'
 )

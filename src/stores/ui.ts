@@ -11,6 +11,10 @@ export const useUiStore = defineStore('ui', {
   actions: {
     applyTheme() {
       document.documentElement.classList.toggle('dark', this.isDark)
+      // 浏览器导航栏（移动端地址栏/浏览器 chrome）颜色跟随主题，与 --c-canvas 令牌一致
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', this.isDark ? '#0e0e11' : '#f9fafb')
     },
     toggleDark() {
       this.isDark = !this.isDark

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/posts'
+import { applySeo } from '@/composables/useSeo'
 import { useUserStore } from '@/stores/user'
 import { useUiStore } from '@/stores/ui'
 import { fileNameFromUrl, formatDate, formatRelativeTime, shortId } from '@/utils/format'
@@ -41,6 +42,17 @@ onMounted(() => {
   void postStore.fetchDetail(postId.value)
   void postStore.fetchReplies(postId.value, { page: 1 })
 })
+
+// 帖子加载完成后注入动态 SEO（og:title / og:description / canonical 指向本帖）
+watch(
+  () => postStore.detail,
+  (detail) => {
+    if (!detail) return
+    const excerpt = (detail.content ?? '').replace(/[#>*`\-\[\]()\n]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120)
+    applySeo({ title: detail.title, description: excerpt || undefined, path: route.path })
+  },
+  { immediate: true },
+)
 
 async function handleLike() {
   const now = Date.now()
