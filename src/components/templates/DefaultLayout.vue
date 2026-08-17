@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppNavbar from '@/components/organisms/AppNavbar.vue'
+import BACard from '@/components/molecules/BACard.vue'
 
 /** 页脚社交入口（simpleicons.org 图标）；TODO：替换为官方群/账号链接 */
 const socials = [
@@ -36,6 +37,10 @@ const socials = [
           <RouterLink to="/exams">联考</RouterLink>
           <RouterLink to="/announcements">公告</RouterLink>
         </nav>
+        <div :class="$style.badApple">
+          <!-- 像素画背景用页面底色、前景用次文字灰，随明暗模式自动适配 -->
+          <BACard bg-color="var(--c-canvas)" primary-color="var(--c-steel)" />
+        </div>
         <div :class="$style.bottom">
           <p>© 2026 Lunatic ChO · 化学竞赛社区 · 化竞幻想郷</p>
           <div :class="$style.social">
@@ -159,6 +164,13 @@ const socials = [
       color: var(--c-accent);
     }
   }
+}
+
+.badApple {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 640px);
+  margin-top: 1rem;
 }
 
 .bottom {
