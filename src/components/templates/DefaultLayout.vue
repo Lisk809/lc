@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
 import AppNavbar from '@/components/organisms/AppNavbar.vue'
 import BACard from '@/components/molecules/BACard.vue'
-import CountdownCard from '@/components/molecules/CountdownCard.vue'
-
-const route = useRoute()
 
 /** 页脚社交入口（simpleicons.org 图标）；TODO：替换为官方群/账号链接 */
 const socials = [
@@ -19,8 +15,6 @@ const socials = [
   <div :class="$style.shell">
     <AppNavbar />
     <main :class="$style.main">
-      <!-- 仅首页展示竞赛倒计时 -->
-      <CountdownCard v-if="route.name === 'home'" :class="$style.clock" />
       <RouterView v-slot="{ Component }">
         <Transition name="page" mode="out-in">
           <component :is="Component" :key="$route.fullPath" />
@@ -86,10 +80,6 @@ const socials = [
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.clock {
-  margin-block: var(--space-section) 0;
 }
 
 .footer {

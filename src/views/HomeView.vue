@@ -9,6 +9,7 @@ import { useCountUp } from '@/composables/useCountUp'
 import { formatDateShort } from '@/utils/format'
 import type { Announcement, Post } from '@/types'
 import PostCard from '@/components/molecules/PostCard.vue'
+import CountdownCard from '@/components/molecules/CountdownCard.vue'
 import SakuraPetals from '@/components/molecules/SakuraPetals.vue'
 import SpellCard from '@/components/molecules/SpellCard.vue'
 import SkeletonBox from '@/components/atoms/SkeletonBox.vue'
@@ -154,6 +155,18 @@ function goCreateQuestion() {
             </p>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- 比赛倒计时（hero 之后、告示板之前） -->
+    <section :class="$style.section">
+      <div v-reveal :class="$style.sectionInner">
+        <header class="sectionHead">
+          <div>
+            <p class="eyebrow">比赛倒计时 · COUNTDOWN</p>
+          </div>
+        </header>
+        <CountdownCard />
       </div>
     </section>
 

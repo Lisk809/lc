@@ -63,7 +63,7 @@ onBeforeUnmount(() => clearInterval(timer))
   </div>
 </template>
 
-<style module lang="scss">
+<style scoped lang="scss">
 .countdown {
   display: flex;
   justify-content: center;
@@ -98,13 +98,13 @@ onBeforeUnmount(() => clearInterval(timer))
 
 .card {
   position: relative;
-  min-width: 1.65em;
-  padding: 0.4em 0;
+  min-width: 2.1em;
+  padding: 0.6em 0;
   text-align: center;
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   background: var(--c-surface-2);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.35),
     inset 0 0 0 1px var(--c-border);
